@@ -4,7 +4,7 @@ namespace Wiser\LdapUserProviderBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Wiser\LdapBundle\Security\LdapUserProviderFactory;
+use Wiser\LdapUserProviderBundle\Security\LdapUserProviderFactory;
 
 class WiserLdapUserProviderBundle extends Bundle
 {

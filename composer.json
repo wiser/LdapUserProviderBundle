@@ -1,0 +1,14 @@
+{
+    "name": "wiser/ldap-user-provider-bundle",
+    "description": "LDAP user provider bundle for Symfony 3.4",
+    "homepage": "https://github.com/Wiser/LdapUserProviderBundle",
+    "license": "apache-2.0",
+    "require": {
+        "php": ">=5.3.3",
+        "ext-ldap": "*",
+        "symfony/symfony": "^3.4"
+    },
+    "autoload": {
+        "psr-4": { "Wiser\\LdapUserProviderBundle\\": "" }
+    }
+}

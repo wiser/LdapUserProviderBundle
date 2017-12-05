@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="wiser.security.user.provider.ldap" class="Wiser\LdapUserProviderBundle\Security\LdapUserProvider" abstract="true">
+            <argument /> <!-- ldapConnection -->
+            <argument /> <!-- baseDn -->
+            <argument /> <!-- searchDn -->
+            <argument /> <!-- searchPassword -->
+            <argument /> <!-- uidKey -->
+            <argument /> <!-- filter -->
+            <argument /> <!-- rolesOuFilter -->
+            <argument /> <!-- rolesUserAttribute -->
+        </service>
+    </services>
+
+</container>

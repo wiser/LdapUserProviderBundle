@@ -5,8 +5,7 @@
     "license": "apache-2.0",
     "require": {
         "php": ">=5.3.3",
-        "ext-ldap": "*",
-        "symfony/symfony": "^3.4"
+        "ext-ldap": "*"
     },
     "autoload": {
         "psr-4": { "Wiser\\LdapUserProviderBundle\\": "" }

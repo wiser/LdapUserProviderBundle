@@ -168,7 +168,7 @@ class LdapUserProvider implements UserProviderInterface
                     return sprintf(
                         '%s_%s',
                         'ROLE',
-                        str_replace('-', '_', $this->getAttributeValue($entry, 'cn'))
+                        strtoupper(str_replace('-', '_', $this->getAttributeValue($entry, 'cn')))
                     );
                 },
                 $entries->toArray()

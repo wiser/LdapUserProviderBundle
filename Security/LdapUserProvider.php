@@ -157,7 +157,7 @@ class LdapUserProvider implements UserProviderInterface
      */
     private function getLdapRoles(Entry $entry)
     {
-        $rolesBaseDn = $this->rolesOuFilter . ',' . $this->baseDn;
+        $rolesBaseDn = empty($this->rolesOuFilter) ? $this->baseDn : $this->rolesOuFilter . ',' . $this->baseDn;
         $rolesFilter = sprintf('(&%s(member=%s))', $this->rolesFilter, $entry->getDn());
         $search = $this->ldapConnection->query($rolesBaseDn, $rolesFilter, ['filter' => ['cn']]);
         $entries = $search->execute();

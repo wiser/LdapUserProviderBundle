@@ -15,7 +15,7 @@
         "ext-ldap": "*",
         "symfony/dependency-injection": "^3.4|^4.4",
         "symfony/ldap": "^3.4|^4.4",
-        "symfony/security": "^3.4|^4.4"
+        "symfony/security": "^3.4.26|^4.4"
     },
     "autoload": {
         "psr-4": { "Wiser\\LdapUserProviderBundle\\": "" }

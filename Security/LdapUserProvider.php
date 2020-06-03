@@ -122,7 +122,7 @@ class LdapUserProvider implements UserProviderInterface
         $roles = $this->getLdapRoles($entry);
         $password = null;
 
-        return new User($username, $password, $roles);
+        return new User(strtolower($username), $password, $roles);
     }
 
     /**

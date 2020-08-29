@@ -2,7 +2,7 @@
     "name": "wiser/ldap-user-provider-bundle",
     "type": "symfony-bundle",
     "description": "LDAP user provider bundle for Symfony 3.4, 4.4",
-    "keywords": ["ldap", "active directory"],
+    "keywords": ["symfony", "ldap", "active directory"],
     "homepage": "https://github.com/Wiser/LdapUserProviderBundle",
     "license": "apache-2.0",
     "authors": [

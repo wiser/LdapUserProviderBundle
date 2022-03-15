@@ -1,7 +1,7 @@
 {
     "name": "wiser/ldap-user-provider-bundle",
     "type": "symfony-bundle",
-    "description": "LDAP user provider bundle for Symfony 3.4, 4.4",
+    "description": "LDAP user provider bundle for Symfony 5.4",
     "keywords": ["symfony", "ldap", "active directory"],
     "homepage": "https://github.com/Wiser/LdapUserProviderBundle",
     "license": "apache-2.0",
@@ -13,16 +13,16 @@
     "require": {
         "php": "^5.5.9|>=7.0.8",
         "ext-ldap": "*",
-        "symfony/dependency-injection": "^3.4|^4.4",
-        "symfony/ldap": "^3.4|^4.4",
-        "symfony/security": "^3.4.26|^4.4.23"
+        "symfony/dependency-injection": "^5.4",
+        "symfony/ldap": "^5.4",
+        "symfony/security-bundle": "^5.4"
     },
     "autoload": {
         "psr-4": { "Wiser\\LdapUserProviderBundle\\": "" }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.x-dev"
+            "dev-master": "2.x-dev"
         }
     }
 }

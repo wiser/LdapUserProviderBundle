@@ -5,8 +5,8 @@ namespace Wiser\LdapUserProviderBundle\Security;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Ldap\Security\LdapUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Ldap\Exception\ConnectionException;
@@ -30,16 +30,25 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * @param LdapInterface $ldapConnection
      * @param string        $baseDn
-     * @param string        $searchDn
-     * @param string        $searchPassword
-     * @param string        $uidKey
-     * @param string        $filter
-     * @param string        $rolesOuFilter
-     * @param string        $rolesUserAttribute
-     * @param string        $rolesFilter
+     * @param string|null   $searchDn
+     * @param string|null   $searchPassword
+     * @param string|null   $uidKey
+     * @param string|null   $filter
+     * @param string|null   $rolesOuFilter
+     * @param string|null   $rolesUserAttribute
+     * @param string|null   $rolesFilter
      */
-    public function __construct(LdapInterface $ldapConnection, $baseDn, $searchDn = null, $searchPassword = null, $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})', $rolesOuFilter = '', $rolesUserAttribute = 'member', $rolesFilter = '(objectClass=group)')
-    {
+    public function __construct(
+        LdapInterface $ldapConnection,
+        string        $baseDn,
+        ?string       $searchDn = null,
+        ?string       $searchPassword = null,
+        ?string       $uidKey = 'sAMAccountName',
+        ?string       $filter = '({uid_key}={identifier})',
+        ?string       $rolesOuFilter = '',
+        ?string       $rolesUserAttribute = 'member',
+        ?string       $rolesFilter = '(objectClass=group)'
+    ) {
         $this->ldapConnection = $ldapConnection;
         $this->baseDn = $baseDn;
         $this->searchDn = $searchDn;
@@ -52,40 +61,48 @@ class LdapUserProvider implements UserProviderInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function loadUserByUsername(string $username)
+    {
+        return $this->loadUserByIdentifier($username);
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByIdentifier($identifier)
     {
         try {
             $this->ldapConnection->bind($this->searchDn, $this->searchPassword);
-            $username = $this->ldapConnection->escape($username, '', LdapInterface::ESCAPE_FILTER);
-            $query = str_replace('{username}', $username, $this->defaultSearch);
+            $identifier = $this->ldapConnection->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
+            $query = str_replace('{identifier}', $identifier, $this->defaultSearch);
             $search = $this->ldapConnection->query($this->baseDn, $query);
         } catch (ConnectionException $e) {
-            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username), 0, $e);
+            throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
         }
 
         $entries = $search->execute();
         $count = count($entries);
 
         if (!$count) {
-            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
+            throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier));
         }
 
         if ($count > 1) {
-            throw new UsernameNotFoundException('More than one user found');
+            throw new UserNotFoundException('More than one user found');
         }
 
         $entry = $entries[0];
 
         try {
             if (null !== $this->uidKey) {
-                $username = $this->getAttributeValue($entry, $this->uidKey);
+                $identifier = $this->getAttributeValue($entry, $this->uidKey);
             }
         } catch (InvalidArgumentException $e) {
         }
 
-        return $this->loadUser($username, $entry);
+        return $this->loadUser($identifier, $entry);
     }
 
     /**
@@ -93,36 +110,36 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
         $password = null;
 
-        return new User($user->getUsername(), $password, $user->getRoles());
+        return new LdapUser($user->getEntry(), $user->getUserIdentifier(), $password, $user->getRoles());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
-    {
-        return 'Symfony\Component\Security\Core\User\User' === $class;
+    public function supportsClass(string $class)
+    : bool {
+        return LdapUser::class === $class || is_subclass_of($class, LdapUser::class);
     }
 
     /**
      * Loads a user from an LDAP entry.
      *
-     * @param string $username
+     * @param string $userIdentifier
      * @param Entry  $entry
      *
-     * @return User
+     * @return LdapUser
      */
-    protected function loadUser($username, Entry $entry)
-    {
+    protected function loadUser(string $userIdentifier, Entry $entry)
+    : LdapUser {
         $roles = $this->getLdapRoles($entry);
         $password = null;
 
-        return new User(strtolower($username), $password, $roles);
+        return new LdapUser($entry, strtolower($userIdentifier), $password, $roles);
     }
 
     /**
@@ -133,8 +150,8 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @return string
      */
-    private function getAttributeValue(Entry $entry, $attribute)
-    {
+    private function getAttributeValue(Entry $entry, string $attribute)
+    : string {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));
         }
@@ -156,7 +173,7 @@ class LdapUserProvider implements UserProviderInterface
      * @return array
      */
     private function getLdapRoles(Entry $entry)
-    {
+    : array {
         $rolesBaseDn = empty($this->rolesOuFilter) ? $this->baseDn : $this->rolesOuFilter . ',' . $this->baseDn;
         $rolesFilter = sprintf('(&%s(member=%s))', $this->rolesFilter, $entry->getDn());
         $search = $this->ldapConnection->query($rolesBaseDn, $rolesFilter, ['filter' => ['cn']]);

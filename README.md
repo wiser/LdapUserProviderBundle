@@ -42,7 +42,7 @@ services:
 security:
     providers:
         my_ldap:
-            wiser_ldap: # this is the configuration key that matches the bundle
+            wiser_ldap: # this is the configuration key that matches this bundle
                 service: Symfony\Component\Ldap\Ldap
                 base_dn: '%ldap.base_dn%'
                 search_dn: '%ldap.user%'
@@ -58,11 +58,11 @@ security:
                     check_path: login
                     csrf_token_generator: security.csrf.token_manager
                     service: Symfony\Component\Ldap\Ldap
-                    provider: my_ldap
                     dn_string: '%ldap.base_dn%'
                     search_dn: '%ldap.user%'
                     search_password: '%ldap.password%'
                     query_string: (&(ObjectClass=Person)(sAMAccountName={username}))
+                    provider: my_ldap
 ```
 
 **Note:**

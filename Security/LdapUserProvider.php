@@ -40,14 +40,14 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function __construct(
         LdapInterface $ldapConnection,
-        string        $baseDn,
-        ?string       $searchDn = null,
-        ?string       $searchPassword = null,
-        ?string       $uidKey = 'sAMAccountName',
-        ?string       $filter = '({uid_key}={identifier})',
-        ?string       $rolesOuFilter = '',
-        ?string       $rolesUserAttribute = 'member',
-        ?string       $rolesFilter = '(objectClass=group)'
+        $baseDn,
+        $searchDn = null,
+        $searchPassword = null,
+        $uidKey = 'sAMAccountName',
+        $filter = '({uid_key}={username})',
+        $rolesOuFilter = '',
+        $rolesUserAttribute = 'member',
+        $rolesFilter = '(objectClass=group)'
     ) {
         $this->ldapConnection = $ldapConnection;
         $this->baseDn = $baseDn;
@@ -63,7 +63,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * @inheritDoc
      */
-    public function loadUserByUsername(string $username)
+    public function loadUserByUsername($username)
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -76,7 +76,7 @@ class LdapUserProvider implements UserProviderInterface
         try {
             $this->ldapConnection->bind($this->searchDn, $this->searchPassword);
             $identifier = $this->ldapConnection->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
-            $query = str_replace('{identifier}', $identifier, $this->defaultSearch);
+            $query = str_replace('{username}', $identifier, $this->defaultSearch);
             $search = $this->ldapConnection->query($this->baseDn, $query);
         } catch (ConnectionException $e) {
             throw new UserNotFoundException(sprintf('User "%s" not found.', $identifier), 0, $e);
@@ -121,7 +121,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass(string $class)
+    public function supportsClass($class)
     : bool {
         return LdapUser::class === $class || is_subclass_of($class, LdapUser::class);
     }
@@ -134,7 +134,7 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @return LdapUser
      */
-    protected function loadUser(string $userIdentifier, Entry $entry)
+    protected function loadUser($userIdentifier, Entry $entry)
     : LdapUser {
         $roles = $this->getLdapRoles($entry);
         $password = null;
@@ -150,8 +150,8 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @return string
      */
-    private function getAttributeValue(Entry $entry, string $attribute)
-    : string {
+    private function getAttributeValue(Entry $entry, $attribute)
+    {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));
         }

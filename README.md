@@ -4,7 +4,7 @@ This bundle provides LDAP authentication. It can also be used for authorization 
 It relies on the standard ldap php extension.
 
 ## Dependencies
-    - it should be compliant with Symfony 3.4 and 4.4
+    - it should be compliant with Symfony 3.4, 4.4 and 5.4
     - ext-ldap
     - symfony/ldap
 

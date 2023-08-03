@@ -41,7 +41,7 @@ class LdapUserProviderFactory implements UserProviderFactoryInterface
                 ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
                 ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
                 ->scalarNode('roles_ou_filter')->defaultNull()->end()
-                ->scalarNode('roles_user_attribute')->defaultNull()->end()
+                ->scalarNode('roles_user_attribute')->defaultValue('member')->end()
             ->end()
         ;
     }

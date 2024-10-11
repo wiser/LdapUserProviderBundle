@@ -71,7 +71,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByIdentifier($identifier)
+    public function loadUserByIdentifier($identifier): UserInterface
     {
         try {
             $this->ldapConnection->bind($this->searchDn, $this->searchPassword);
@@ -108,7 +108,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof LdapUser) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));

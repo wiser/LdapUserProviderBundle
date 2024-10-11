@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class LdapUserProviderFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, $id, $config): void
     {
         $container
             ->setDefinition($id, new ChildDefinition('wiser.security.user.provider.ldap'))
@@ -25,12 +25,12 @@ class LdapUserProviderFactory implements UserProviderFactoryInterface
         ;
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'wiser_ldap';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

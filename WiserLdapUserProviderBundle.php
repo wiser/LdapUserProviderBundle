@@ -8,7 +8,7 @@ use Wiser\LdapUserProviderBundle\Security\LdapUserProviderFactory;
 
 class WiserLdapUserProviderBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $extension = $container->getExtension('security');
         $extension->addUserProviderFactory(new LdapUserProviderFactory);
